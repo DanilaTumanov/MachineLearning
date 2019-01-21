@@ -13,10 +13,13 @@ namespace MovementTest
 
         public MovementGene(Movement value) : base(value) { }
 
+        public MovementGene(string name) : base(name)
+        {
+        }
 
         public override Gene GetRandom()
         {
-            return new MovementGene();
+            return new MovementGene(Name);
         }
 
         public override void Randomize()
@@ -35,11 +38,9 @@ namespace MovementTest
     public enum Movement
     {
         Forward,
-        Back,
         Left,
         Right,
-        //Jump,
-        //Crouch
+        Turn180
     }
 
 }

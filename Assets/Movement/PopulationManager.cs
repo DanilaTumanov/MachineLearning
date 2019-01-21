@@ -13,10 +13,9 @@ namespace MovementTest
 
         public GameObject botPrefab;
         public int populationSize = 50;
-
+        public float trialTime = 5;
 
         private List<Brain> population = new List<Brain>();
-        private float trialTime = 5;
         private int generation = 1;
         private int mutationsCount = 0;
 
@@ -67,11 +66,8 @@ namespace MovementTest
 
         private void BreedNewPopulation()
         {
-            List<Brain> sortedList = population.OrderBy(p => p.timeAlive).ToList();
-
-            print("------->>>>>>>>>> GEN " + generation);
-            sortedList.GroupBy(b => (b.dna.GetGene<MovementGene>().Value)).ToList().ForEach(g => print("MovementGene: " + g.Count() + " " + g.Key));
-
+            List<Brain> sortedList = population.OrderBy(p => p.timeAlive + p.distance).ToList();
+            
             population.Clear();
             mutationsCount = 0;
 
@@ -90,27 +86,17 @@ namespace MovementTest
         {
             DNA dna;
             Brain brain;
+            
 
-            // TODO: Мутация вызывает проблемы через несколько поколений - почти все становятся мутантами)
             if (Random.Range(0, 100) == 1)
             {
                 dna = brain1.dna.Mutate();
                 mutationsCount++;
-
-                print("MUTATION: " + brain1.dna.GetGene<MovementGene>().Value + " -> " + dna.GetGene<MovementGene>().Value);
             }
             else
             {
                 dna = brain1.dna.Combine(brain2.dna);
-
-                //print(brain1.dna.GetGene<MovementGene>().Value + " + " + brain2.dna.GetGene<MovementGene>().Value + " = " + dna.GetGene<MovementGene>().Value);
             }
-
-            //if(dna.GetGene<MovementGene>() != brain1.dna.GetGene<MovementGene>() 
-            //    && dna.GetGene<MovementGene>() != brain2.dna.GetGene<MovementGene>())
-            //{
-            //    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            //}
 
             brain = InstantiatePerson();
             brain.Init(dna);
@@ -127,7 +113,7 @@ namespace MovementTest
                 transform.position.y, 
                 transform.position.z + Random.Range(-2, 3));
 
-            Brain brain = Instantiate(botPrefab, pos, Quaternion.identity).GetComponent<Brain>();
+            Brain brain = Instantiate(botPrefab, pos, Quaternion.Euler(0, Random.Range(0, 4) * 90, 0)).GetComponent<Brain>();
 
             return brain;
         }

@@ -10,10 +10,10 @@ namespace MovementTest
     public class DNA
     {
 
-        private Dictionary<Type, Gene> _genes = new Dictionary<Type, Gene>();
+        private Dictionary<string, Gene> _genes = new Dictionary<string, Gene>();
 
 
-        public Dictionary<Type, Gene> Genes { get => _genes; }
+        public Dictionary<string, Gene> Genes => _genes;
 
 
 
@@ -25,7 +25,7 @@ namespace MovementTest
 
         private void SetGenes(List<Gene> genes)
         {
-            genes.ForEach(gene => _genes.Add(gene.GetType(), gene));
+            genes.ForEach(gene => _genes.Add(gene.Name != null ? gene.Name : gene.GetType().ToString(), gene));
         }
 
 
@@ -37,6 +37,12 @@ namespace MovementTest
             {
                 if (dna2.Genes.ContainsKey(gene.Key))
                 {
+                    if (gene.Value.Name == "MovementTest.MovementGene" ||
+                        dna2.Genes[gene.Key].Name == "MovementTest.MovementGene")
+                    {
+                        Debug.Log("Here");
+                    }
+
                     newGenes.Add(UnityEngine.Random.Range(0, 2) == 0 ? gene.Value : dna2.Genes[gene.Key]);
                 }
             }
@@ -51,16 +57,25 @@ namespace MovementTest
             int randIndex = UnityEngine.Random.Range(0, genes.Count());
 
             genes[randIndex] = genes[randIndex].GetRandom();
-
-            DNA mutatedDNA = new DNA(genes);
-
-            return mutatedDNA;
+            
+            return new DNA(genes);
         }
 
 
         public T GetGene<T>() where T: Gene
         {
-            return (T)_genes[typeof(T)];
+            return (T)_genes[typeof(T).ToString()];
+        }
+
+        public T GetGene<T>(string name) where T : Gene
+        {
+            if (!_genes.ContainsKey(name))
+            {
+                Debug.Log(_genes.Count());
+                _genes.Keys.ToList().ForEach(g => Debug.Log(g));
+            }
+
+            return (T)_genes[name];
         }
     }
 

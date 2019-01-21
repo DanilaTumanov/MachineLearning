@@ -10,6 +10,8 @@ namespace MovementTest
 
         protected object _value;
 
+        public string Name { get; protected set; }
+
         public Gene()
         {
             Randomize();
@@ -19,6 +21,12 @@ namespace MovementTest
         {
             _value = value;
         }
+
+        public Gene(string name) : this()
+        {
+            Name = name;
+        }
+
 
 
         public object GetValue()
@@ -53,6 +61,8 @@ namespace MovementTest
         public Gene(T value) : base(value) { }
 
         public Gene() : base() { }
+
+        public Gene(string name) : base(name) { }
 
 
 

@@ -6,30 +6,22 @@ using UnityStandardAssets.Characters.ThirdPerson;
 namespace MovementTest
 {
 
-    [RequireComponent(typeof (ThirdPersonCharacter))]
-    public class Brain : MonoBehaviour
+    [RequireComponent(typeof(ThirdPersonCharacter))]
+    public class StraightWalkBrain : Brain
     {
-
-        public int DNALength = 1;
-        public float timeAlive;
-        public DNA dna;
 
         private ThirdPersonCharacter _character;
         private Vector3 _move;
         private bool _jump;
-        private bool _alive = true;
+       
 
-
-        private void OnCollisionEnter(Collision obj)
+        private void Awake()
         {
-            if(obj.gameObject.tag == "dead")
-            {
-                _alive = false;
-            }
+            _character = GetComponent<ThirdPersonCharacter>();
         }
 
 
-        public void Init()
+        public override void Init()
         {
             Init(
                 new DNA(
@@ -40,15 +32,6 @@ namespace MovementTest
                     }
                 )
             );
-        }
-
-        public void Init(DNA dna)
-        {
-            this.dna = dna;
-
-            _character = GetComponent<ThirdPersonCharacter>();
-            timeAlive = 0;
-            _alive = true;
         }
 
 
@@ -87,3 +70,5 @@ namespace MovementTest
     }
 
 }
+
+
