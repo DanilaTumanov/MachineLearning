@@ -13,7 +13,14 @@ namespace MovementTest
 
         public GameObject botPrefab;
         public int populationSize = 50;
+
+        [Range(0, 100)]
+        public int mutationChance = 1;
         public float trialTime = 5;
+        public float trialTimeIcrease = 0;
+
+        public Vector2Int xBounds = new Vector2Int(-2, 2);
+        public Vector2Int zBounds = new Vector2Int(-2, 2);
 
         private List<Brain> population = new List<Brain>();
         private int generation = 1;
@@ -30,7 +37,7 @@ namespace MovementTest
             GUI.BeginGroup(new Rect(10, 10, 250, 150));
             GUI.Box(new Rect(0, 0, 140, 140), "Stats", guiStyle);
             GUI.Label(new Rect(10, 25, 200, 30), "Generation: " + generation, guiStyle);
-            GUI.Label(new Rect(10, 50, 200, 30), "Trial Time: " + (int)elapsed, guiStyle);
+            GUI.Label(new Rect(10, 50, 200, 30), "Trial Time: " + (int) (trialTime - elapsed), guiStyle);
             GUI.Label(new Rect(10, 75, 200, 30), "Population: " + population.Count, guiStyle);
             GUI.Label(new Rect(10, 100, 200, 30), "Mutations: " + mutationsCount, guiStyle);
             GUI.EndGroup();
@@ -66,7 +73,11 @@ namespace MovementTest
 
         private void BreedNewPopulation()
         {
-            List<Brain> sortedList = population.OrderBy(p => p.timeAlive + p.distance).ToList();
+            List<Brain> sortedList = population.OrderBy(
+                p =>
+                    p.timeAlive + 
+                    (p.distance/* + Vector3.Distance(transform.position, p.transform.position)*/)
+                ).ToList();
             
             population.Clear();
             mutationsCount = 0;
@@ -79,6 +90,7 @@ namespace MovementTest
 
             sortedList.ForEach(p => Destroy(p.gameObject));
             generation++;
+            trialTime += trialTimeIcrease;
         }
 
 
@@ -88,7 +100,7 @@ namespace MovementTest
             Brain brain;
             
 
-            if (Random.Range(0, 100) == 1)
+            if (Random.Range(0, 100) < mutationChance)
             {
                 dna = brain1.dna.Mutate();
                 mutationsCount++;
@@ -109,9 +121,9 @@ namespace MovementTest
         private Brain InstantiatePerson()
         {
             Vector3 pos = new Vector3(
-                transform.position.x + Random.Range(-2, 3),
+                transform.position.x + Random.Range(xBounds.x, xBounds.y + 1),
                 transform.position.y, 
-                transform.position.z + Random.Range(-2, 3));
+                transform.position.z + Random.Range(zBounds.x, zBounds.y + 1));
 
             Brain brain = Instantiate(botPrefab, pos, Quaternion.Euler(0, Random.Range(0, 4) * 90, 0)).GetComponent<Brain>();
 
