@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,6 +12,8 @@ public class Perceptron
     
     private float _bias;
 
+    private Func<float, float> _adapter;
+
 
     public Perceptron(byte inputsNum)
     {
@@ -21,9 +24,14 @@ public class Perceptron
             _inputs[i] = new PerceptronInput();
         }
 
-        _bias = Random.Range(-0.99f, 0.99f);
+        _bias = UnityEngine.Random.Range(-0.99f, 0.99f);
     }
 
+
+    public Perceptron(byte inputsNum, Func<float, float> adapter): this(inputsNum)
+    {
+        _adapter = adapter;
+    }
 
 
     public float Process(IEnumerable<float> inputs)
@@ -31,14 +39,20 @@ public class Perceptron
         SetInputs(inputs);
 
         float res = 0;
-
+        
         for(var i = 0; i < _inputs.Length; i++)
         {
             res += _inputs[i].input * _inputs[i].weight;
+            //Debug.Log("weight " + (i + 1) + ": " + _inputs[i].weight);
         }
 
-        return res += _bias;
+        res += _bias;
+
+        //Debug.Log("bias: " + _bias);
+
+        return _adapter != null ? _adapter(res) : res;
     }
+    
 
 
     private void SetInputs(IEnumerable<float> inputs)
@@ -60,12 +74,18 @@ public class Perceptron
 
     public void AdjustError(float error)
     {
+
+
         for (var i = 0; i < _inputs.Length; i++)
         {
+            //Debug.Log("Before adj: " + _inputs[i].weight);
             _inputs[i].AdjustError(error);
+            //Debug.Log("Error: " + error + " ----> " + _inputs[i].weight);
         }
 
         _bias += error;
+
+        //Debug.Log("BIAS: " + _bias);
     }
 
 }
@@ -79,7 +99,7 @@ public class PerceptronInput
 
     public PerceptronInput()
     {
-        weight = Random.Range(-0.99f, 0.99f);
+        weight = UnityEngine.Random.Range(-0.99f, 0.99f);
     }
 
     public void AdjustError(float error)
